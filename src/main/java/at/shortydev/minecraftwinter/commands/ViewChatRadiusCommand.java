@@ -5,7 +5,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -19,29 +18,72 @@ import java.util.Map;
 import java.util.Set;
 
 public class ViewChatRadiusCommand implements CommandExecutor {
-    
+
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
         if (commandSender instanceof Player) {
             Player player = (Player) commandSender;
 
-            Set<Location> blocks = circle(player.getLocation(), 30, true);
-            
-            Map<Location, BlockData> oldData = new HashMap<>();
-            
-            BlockData blockData = Bukkit.getServer().createBlockData(Material.RED_STAINED_GLASS);
-            
-            blocks.forEach(location -> {
-                oldData.put(location, location.getBlock().getBlockData().clone());
-                player.sendBlockChange(location, blockData);
-            });
+            final Location center = player.getLocation().clone();
+
+            int[] index = {-15, -1};
 
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    blocks.forEach(location -> player.sendBlockChange(location, oldData.get(location)));
+                    index[0]++;
+
+                    if (index[0] < 15) {
+                        Set<Location> blocks = circle(center, 15 + index[0], true);
+
+                        Map<Location, BlockData> oldData = new HashMap<>();
+
+                        BlockData blockData = Bukkit.getServer().createBlockData(Material.RED_STAINED_GLASS);
+
+                        blocks.forEach(location -> {
+                            oldData.put(location, location.getBlock().getBlockData().clone());
+                            player.sendBlockChange(location, blockData);
+                        });
+
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                blocks.forEach(location -> player.sendBlockChange(location, oldData.get(location)));
+                            }
+                        }.runTaskLater(MinecraftWinter.getInstance(), index[0] == 14 ? 100L : 1L);
+                    } else if (index[0] == 15) {
+                        index[1] = 15;
+                        cancel();
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                index[1]--;
+                                if (index[1] < 0) {
+                                    cancel();
+                                    return;
+                                }
+                                Set<Location> blocks = circle(center, 15 + index[1], true);
+
+                                Map<Location, BlockData> oldData = new HashMap<>();
+
+                                BlockData blockData = Bukkit.getServer().createBlockData(Material.RED_STAINED_GLASS);
+
+                                blocks.forEach(location -> {
+                                    oldData.put(location, location.getBlock().getBlockData().clone());
+                                    player.sendBlockChange(location, blockData);
+                                });
+
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        blocks.forEach(location -> player.sendBlockChange(location, oldData.get(location)));
+                                    }
+                                }.runTaskLater(MinecraftWinter.getInstance(), 1L);
+                            }
+                        }.runTaskTimer(MinecraftWinter.getInstance(), 100L, 1L);
+                    }
                 }
-            }.runTaskLater(MinecraftWinter.getInstance(), 100L);
+            }.runTaskTimer(MinecraftWinter.getInstance(), 0L, 1L);
         }
         return false;
     }
