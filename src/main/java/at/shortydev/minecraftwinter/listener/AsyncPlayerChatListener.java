@@ -37,7 +37,7 @@ public class AsyncPlayerChatListener implements Listener {
                         message[0] = message[0].replace(onlinePlayer.getName(), "§c@" + onlinePlayer.getName() + "§r");
                     });
             event.setMessage(message[0]);
-            event.setFormat("§7[§eGlobal§7] " + (player.isOp() ? "§7[§cOPERATOR§7] " : "") + "§7" + player.getName() + "§f: " + event.getMessage().substring(1));
+            event.setFormat("§7[§eGlobal§7] " + (player.isOp() ? "§7[§cOPERATOR§7] " : "") + "§7" + player.getName() + "§f: " + event.getMessage().substring(1).trim());
         } else if (event.getMessage().startsWith("*") && event.getMessage().length() > 1) {
             event.getRecipients().clear();
             List<Player> playerStream = player.getWorld().getPlayers().stream()
@@ -46,7 +46,7 @@ public class AsyncPlayerChatListener implements Listener {
             playerStream.forEach(event.getRecipients()::add);
             if (playerStream.size() <= 1)
                 player.sendMessage("§7§oNiemand kann sehen was du machst...");
-            event.setFormat("*§o" + player.getName() + " " + event.getMessage().substring(1) + "*");
+            event.setFormat("*§o" + player.getName() + " " + event.getMessage().substring(1).trim() + "*");
         } else {
             event.getRecipients().clear();
             List<Player> playerStream = player.getWorld().getPlayers().stream()
@@ -55,7 +55,7 @@ public class AsyncPlayerChatListener implements Listener {
             playerStream.forEach(event.getRecipients()::add);
             if (playerStream.size() <= 1)
                 player.sendMessage("§7§oNiemand kann dich hören... mit @ vor deiner Nachricht schreibst du in den Globalchat.");
-            event.setFormat((player.isOp() ? "§7[§cOPERATOR§7] " : "") + "§7" + player.getName() + "§f: " + event.getMessage());
+            event.setFormat((player.isOp() ? "§7[§cOPERATOR§7] " : "") + "§7" + player.getName() + "§f: " + event.getMessage().trim());
         }
 
     }
