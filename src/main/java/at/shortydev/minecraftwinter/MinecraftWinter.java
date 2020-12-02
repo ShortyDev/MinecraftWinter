@@ -29,7 +29,7 @@ import java.util.Arrays;
 @Description(value = "Sponsored by mc-protection.eu")
 @LoadOrder(value = PluginLoadOrder.POSTWORLD)
 @ApiVersion(value = ApiVersion.Target.v1_13)
-@Commands({@Command(name = "winter"), @Command(name = "farmwelt", aliases = {"fw"}), @Command(name = "spawn", aliases = {"normal"}), @Command(name = "invisibleframe", aliases = {"if", "getframe"}), @Command(name = "status")})
+@Commands({@Command(name = "winter"), @Command(name = "farmwelt", aliases = {"fw"}), @Command(name = "spawn", aliases = {"normal"}), @Command(name = "invisibleframe", aliases = {"if", "getframe"}), @Command(name = "status"), @Command(name = "viewchatrange", aliases = {"vcr"})})
 public class MinecraftWinter extends JavaPlugin {
 
     @Getter
@@ -56,6 +56,7 @@ public class MinecraftWinter extends JavaPlugin {
         getCommand("farmwelt").setExecutor(new FarmweltCommand());
         getCommand("invisibleframe").setExecutor(new InvisibleFrameCommand());
         getCommand("status").setExecutor(new StatusCommand());
+        getCommand("viewchatrange").setExecutor(new ViewChatRadiusCommand());
 
         Listener[] listeners = new Listener[]{
                 new PlayerJoinListener(), new PlayerQuitListener(), new PlayerDeathListener(), new PlayerRespawnListener(), new PlayerMoveListener(), new EntityDamageListener(),
