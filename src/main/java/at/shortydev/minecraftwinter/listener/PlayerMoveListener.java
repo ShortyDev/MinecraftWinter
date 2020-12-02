@@ -38,20 +38,22 @@ public class PlayerMoveListener implements Listener {
 
         if (PLAYER_AFK_PREDICATE.test(player))
             player.setPlayerListName("§7" + player.getName() + (player.isOp() ? " §7[§cOP§7]" : ""));
-        
+
         LAST_MOVED.put(player, System.currentTimeMillis());
-        
+
         if (ViewChatRadiusCommand.showChatRadius.contains(player.getUniqueId().toString())) {
             Set<Location> blocks = circle(player.getLocation(), 30, true);
-            
+
             Map<Location, BlockData> oldData = new HashMap<>();
 
-            blocks.forEach(location -> {
-                oldData.put(location, location.getBlock().getBlockData().clone());
-                player.sendBlockChange(location, BLOCK_DATA);
-            });
-            ViewChatRadiusCommand.oldDataMap.remove(player.getUniqueId().toString()).entrySet()
-                    .stream().filter(locationBlockDataEntry -> !blocks.contains(locationBlockDataEntry.getKey()))
+            blocks.stream()
+                    .filter(location -> !location.getBlock().getBlockData().getMaterial().toString().contains("SIGN"))
+                    .forEach(location -> {
+                        oldData.put(location, location.getBlock().getBlockData().clone());
+                        player.sendBlockChange(location, BLOCK_DATA);
+                    });
+            ViewChatRadiusCommand.oldDataMap.remove(player.getUniqueId().toString()).entrySet().stream()
+                    .filter(locationBlockDataEntry -> !blocks.contains(locationBlockDataEntry.getKey()))
                     .forEach(locationBlockDataEntry -> player.sendBlockChange(locationBlockDataEntry.getKey(), locationBlockDataEntry.getValue()));
             ViewChatRadiusCommand.oldDataMap.put(player.getUniqueId().toString(), oldData);
         }

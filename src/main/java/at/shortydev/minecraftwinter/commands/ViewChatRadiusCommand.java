@@ -37,10 +37,12 @@ public class ViewChatRadiusCommand implements CommandExecutor {
 
                 BlockData blockData = Bukkit.getServer().createBlockData(Material.RED_STAINED_GLASS);
 
-                blocks.forEach(location -> {
-                    oldData.put(location, location.getBlock().getBlockData().clone());
-                    player.sendBlockChange(location, blockData);
-                });
+                blocks.stream()
+                        .filter(location -> !location.getBlock().getBlockData().getMaterial().toString().contains("SIGN"))
+                        .forEach(location -> {
+                            oldData.put(location, location.getBlock().getBlockData().clone());
+                            player.sendBlockChange(location, blockData);
+                        });
                 
                 oldDataMap.put(player.getUniqueId().toString(), oldData);
             }
