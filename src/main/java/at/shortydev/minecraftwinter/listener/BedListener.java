@@ -66,14 +66,16 @@ public class BedListener implements Listener {
     }
 
     private int calculateNeeded() {
-        int onlineSize = Math.toIntExact(Bukkit.getOnlinePlayers().stream().filter(player -> player.getWorld().getName().equals("world")).count());
-        return neededForSkip.getOrDefault(onlineSize, Math.toIntExact(onlineSize / 3));
+        int onlineSize = Bukkit.getOnlinePlayers().stream().filter(player -> player.getWorld().getName().equals("world")).mapToInt(i -> 1).sum();
+        return neededForSkip.getOrDefault(onlineSize, onlineSize / 3);
     }
 
     private void handle(World world) {
         if (!world.getName().equals("world"))
             return;
         skipAllowed = true;
+        world.setStorm(false);
+        world.setThundering(false);
         world.setTime(0L);
         skipAllowed = false;
         skipTime = System.currentTimeMillis();
