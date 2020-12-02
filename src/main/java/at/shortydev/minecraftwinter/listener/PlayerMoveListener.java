@@ -1,11 +1,14 @@
 package at.shortydev.minecraftwinter.listener;
 
 import at.shortydev.minecraftwinter.MinecraftWinter;
+import at.shortydev.minecraftwinter.commands.ViewChatRadiusCommand;
 import at.shortydev.minecraftwinter.commands.WinterCommand;
 import at.shortydev.minecraftwinter.predicates.PlayerAfkPredicate;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,13 +19,13 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static at.shortydev.minecraftwinter.commands.ViewChatRadiusCommand.circle;
 
 public class PlayerMoveListener implements Listener {
 
+    public static final BlockData BLOCK_DATA = Bukkit.getServer().createBlockData(Material.RED_STAINED_GLASS);
     public static final List<Player> SPAWNED = new ArrayList<>();
     public static final Map<String, ItemStack> ITEMS = new HashMap<>();
     public static final Map<Player, Long> LAST_MOVED = new HashMap<>();
@@ -37,6 +40,21 @@ public class PlayerMoveListener implements Listener {
             player.setPlayerListName("§7" + player.getName() + (player.isOp() ? " §7[§cOP§7]" : ""));
         
         LAST_MOVED.put(player, System.currentTimeMillis());
+        
+        if (ViewChatRadiusCommand.showChatRadius.contains(player.getUniqueId().toString())) {
+            Set<Location> blocks = circle(player.getLocation(), 30, true);
+            
+            Map<Location, BlockData> oldData = new HashMap<>();
+
+            blocks.forEach(location -> {
+                oldData.put(location, location.getBlock().getBlockData().clone());
+                player.sendBlockChange(location, BLOCK_DATA);
+            });
+            ViewChatRadiusCommand.oldDataMap.remove(player.getUniqueId().toString()).entrySet()
+                    .stream().filter(locationBlockDataEntry -> !blocks.contains(locationBlockDataEntry.getKey()))
+                    .forEach(locationBlockDataEntry -> player.sendBlockChange(locationBlockDataEntry.getKey(), locationBlockDataEntry.getValue()));
+            ViewChatRadiusCommand.oldDataMap.put(player.getUniqueId().toString(), oldData);
+        }
 
         if (WinterCommand.starting) {
             event.setCancelled(true);

@@ -10,80 +10,41 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ViewChatRadiusCommand implements CommandExecutor {
+    
+    public static List<String> showChatRadius = new ArrayList<>();
+    public static Map<String, Map<Location, BlockData>> oldDataMap = new HashMap<>();
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
         if (commandSender instanceof Player) {
             Player player = (Player) commandSender;
 
-            final Location center = player.getLocation().clone();
+            if (showChatRadius.contains(player.getUniqueId().toString())) {
+                showChatRadius.remove(player.getUniqueId().toString());
+                player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§7Chat-Radius wird nun nicht mehr angezeigt.");
+                
+                oldDataMap.remove(player.getUniqueId().toString()).forEach(player::sendBlockChange);
+            } else {
+                showChatRadius.add(player.getUniqueId().toString());
+                player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§7Chat-Radius wird nun angezeigt.");
+                Set<Location> blocks = circle(player.getLocation(), 30, true);
 
-            int[] index = {-15, -1};
+                Map<Location, BlockData> oldData = new HashMap<>();
 
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    index[0]++;
+                BlockData blockData = Bukkit.getServer().createBlockData(Material.RED_STAINED_GLASS);
 
-                    if (index[0] < 15) {
-                        Set<Location> blocks = circle(center, 15 + index[0], true);
+                blocks.forEach(location -> {
+                    oldData.put(location, location.getBlock().getBlockData().clone());
+                    player.sendBlockChange(location, blockData);
+                });
+                
+                oldDataMap.put(player.getUniqueId().toString(), oldData);
+            }
 
-                        Map<Location, BlockData> oldData = new HashMap<>();
-
-                        BlockData blockData = Bukkit.getServer().createBlockData(Material.RED_STAINED_GLASS);
-
-                        blocks.forEach(location -> {
-                            oldData.put(location, location.getBlock().getBlockData().clone());
-                            player.sendBlockChange(location, blockData);
-                        });
-
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                blocks.forEach(location -> player.sendBlockChange(location, oldData.get(location)));
-                            }
-                        }.runTaskLater(MinecraftWinter.getInstance(), index[0] == 14 ? 100L : 1L);
-                    } else if (index[0] == 15) {
-                        index[1] = 15;
-                        cancel();
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                index[1]--;
-                                if (index[1] < 0) {
-                                    cancel();
-                                    return;
-                                }
-                                Set<Location> blocks = circle(center, 15 + index[1], true);
-
-                                Map<Location, BlockData> oldData = new HashMap<>();
-
-                                BlockData blockData = Bukkit.getServer().createBlockData(Material.RED_STAINED_GLASS);
-
-                                blocks.forEach(location -> {
-                                    oldData.put(location, location.getBlock().getBlockData().clone());
-                                    player.sendBlockChange(location, blockData);
-                                });
-
-                                new BukkitRunnable() {
-                                    @Override
-                                    public void run() {
-                                        blocks.forEach(location -> player.sendBlockChange(location, oldData.get(location)));
-                                    }
-                                }.runTaskLater(MinecraftWinter.getInstance(), 1L);
-                            }
-                        }.runTaskTimer(MinecraftWinter.getInstance(), 100L, 1L);
-                    }
-                }
-            }.runTaskTimer(MinecraftWinter.getInstance(), 0L, 1L);
         }
         return false;
     }
@@ -91,7 +52,7 @@ public class ViewChatRadiusCommand implements CommandExecutor {
     /*
     https://bukkit.org/threads/spheres-hollow-sphers-circles-hollow-circles-tutorial.306490/
      */
-    private Set<Location> makeHollow(Set<Location> blocks, boolean sphere) {
+    public static Set<Location> makeHollow(Set<Location> blocks, boolean sphere) {
         Set<Location> edge = new HashSet<>();
         if (!sphere) {
             for (Location l : blocks) {
@@ -127,7 +88,7 @@ public class ViewChatRadiusCommand implements CommandExecutor {
         return edge;
     }
 
-    public Set<Location> circle(Location location, int radius, boolean hollow) {
+    public static Set<Location> circle(Location location, int radius, boolean hollow) {
         Set<Location> blocks = new HashSet<>();
         World world = location.getWorld();
         int X = location.getBlockX();
