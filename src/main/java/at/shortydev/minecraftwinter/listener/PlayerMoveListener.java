@@ -37,12 +37,12 @@ public class PlayerMoveListener implements Listener {
         Player player = event.getPlayer();
 
         if (PLAYER_AFK_PREDICATE.test(player))
-            player.setPlayerListName("§7" + player.getName() + (player.isOp() ? " §7[§cOP§7]" : ""));
+            MinecraftWinter.getInstance().setStatus(player, null);
 
         LAST_MOVED.put(player, System.currentTimeMillis());
 
         if (ViewChatRadiusCommand.showChatRadius.contains(player.getUniqueId().toString())) {
-            Set<Location> blocks = circle(player.getLocation(), 30, true);
+            Set<Location> blocks = circle(player.getLocation(), 50, true);
 
             Map<Location, BlockData> oldData = new HashMap<>();
 

@@ -16,7 +16,7 @@ public class PlayerJoinListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        player.setPlayerListName("§7" + player.getName() + (player.isOp() ? " §7[§cOP§7]" : ""));
+        MinecraftWinter.getInstance().setStatus(player, null);
 
         event.setJoinMessage(MinecraftWinter.getInstance().getPrefix() + "§7" + player.getName() + " hat das Spiel §abetreten§7.");
         player.sendMessage("§cSponsored by https://mc-protection.eu (https://discord.gg/DQrJQWQZBd)");

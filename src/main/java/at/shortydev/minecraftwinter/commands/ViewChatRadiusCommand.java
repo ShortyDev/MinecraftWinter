@@ -31,7 +31,7 @@ public class ViewChatRadiusCommand implements CommandExecutor {
             } else {
                 showChatRadius.add(player.getUniqueId().toString());
                 player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§7Chat-Radius wird nun angezeigt.");
-                Set<Location> blocks = circle(player.getLocation(), 30, true);
+                Set<Location> blocks = circle(player.getLocation(), 50, true);
 
                 Map<Location, BlockData> oldData = new HashMap<>();
 

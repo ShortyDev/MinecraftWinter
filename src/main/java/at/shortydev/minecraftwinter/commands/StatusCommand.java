@@ -13,31 +13,35 @@ public class StatusCommand implements CommandExecutor {
         if (commandSender instanceof Player) {
             Player player = (Player) commandSender;
             if (args.length == 1) {
-                String suffix = player.isOp() ? " §7[§cOP§7]" : "";
                 switch (args[0].toLowerCase()) {
                     case "rec":
-                        player.setPlayerListName("§7[§cREC§7] " + player.getName() + suffix);
+                        MinecraftWinter.getInstance().setStatus(player, "§cREC");
+                        MinecraftWinter.getInstance().statusCache.put(player.getUniqueId().toString(), "§cREC");
                         player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§7Neuer Status: §cREC");
                         break;
                     case "live":
-                        player.setPlayerListName("§7[§5LIVE§7] " + player.getName() + suffix);
-                        player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§7Neuer Status: §5LIVE");
+                        MinecraftWinter.getInstance().setStatus(player, "§5LIVE");
+                        MinecraftWinter.getInstance().statusCache.put(player.getUniqueId().toString(), "§5LIVE");
                         break;
                     case "rp":
-                        player.setPlayerListName("§7[§eRP§7] " + player.getName() + suffix);
+                        MinecraftWinter.getInstance().setStatus(player, "§eRP");
+                        MinecraftWinter.getInstance().statusCache.put(player.getUniqueId().toString(), "§RP");
                         player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§7Neuer Status: §eRP");
                         break;
                     case "off":
-                        player.setPlayerListName("§7" + player.getName() + suffix);
+                        MinecraftWinter.getInstance().statusCache.remove(player.getUniqueId().toString());
+                        MinecraftWinter.getInstance().setStatus(player, null);
                         player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§7Status zurückgesetzt.");
                         break;
                     default:
                         if (player.isOp()) {
-                            String message = "§7[" + ChatColor.translateAlternateColorCodes('&', args[0]).toUpperCase() + "§7] ";
-                            player.setPlayerListName(message + "§7" + player.getName() + suffix);
+                            String message = ChatColor.translateAlternateColorCodes('&', args[0]);
+                            MinecraftWinter.getInstance().setStatus(player, message);
+                            MinecraftWinter.getInstance().statusCache.put(player.getUniqueId().toString(), message);
                             player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§7Neuer Status: " + message);
                         } else {
-                            player.setPlayerListName("§7" + player.getName() + suffix);
+                            MinecraftWinter.getInstance().statusCache.remove(player.getUniqueId().toString());
+                            MinecraftWinter.getInstance().setStatus(player, null);
                             player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§7Status zurückgesetzt.");
                         }
                         break;

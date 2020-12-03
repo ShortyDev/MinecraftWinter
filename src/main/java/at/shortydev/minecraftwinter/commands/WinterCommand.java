@@ -4,6 +4,7 @@ import at.shortydev.minecraftwinter.MinecraftWinter;
 import at.shortydev.minecraftwinter.listener.PlayerMoveListener;
 import at.shortydev.minecraftwinter.location.WinterLocation;
 import at.shortydev.minecraftwinter.predicates.NumberPredicate;
+import de.slikey.effectlib.effect.DnaEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -101,6 +102,12 @@ public class WinterCommand implements CommandExecutor {
                         case "reload":
                             MinecraftWinter.getInstance().loadValues();
                             player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§7Winter wurde neu geladen!");
+                            break;
+                        case "dna":
+                            DnaEffect dnaEffect = new DnaEffect(MinecraftWinter.getInstance().getEffectManager());
+                            dnaEffect.iterations = 60;
+                            dnaEffect.setEntity(player);
+                            dnaEffect.start();
                             break;
                         default:
                             player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§c/" + s + " <setspawn/tpheight/vheight/spawn/reload> [height]");

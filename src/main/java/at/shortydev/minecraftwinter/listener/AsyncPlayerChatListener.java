@@ -1,5 +1,6 @@
 package at.shortydev.minecraftwinter.listener;
 
+import at.shortydev.minecraftwinter.MinecraftWinter;
 import at.shortydev.minecraftwinter.predicates.PlayerAfkPredicate;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class AsyncPlayerChatListener implements Listener {
 
-    private final int localRadius = 30;
+    private final int localRadius = 50;
     public static final Map<Player, Long> LAST_CHATTED = new HashMap<>();
 
     @EventHandler
@@ -24,7 +25,7 @@ public class AsyncPlayerChatListener implements Listener {
         Player player = event.getPlayer();
         
         if (new PlayerAfkPredicate().test(player))
-            player.setPlayerListName("§7" + player.getName() + (player.isOp() ? " §7[§cOP§7]" : ""));
+            MinecraftWinter.getInstance().setStatus(player, null);
         
         LAST_CHATTED.put(player, System.currentTimeMillis());
 
@@ -37,7 +38,7 @@ public class AsyncPlayerChatListener implements Listener {
                         message[0] = message[0].replace(onlinePlayer.getName(), "§c@" + onlinePlayer.getName() + "§r");
                     });
             event.setMessage(message[0]);
-            event.setFormat("§7[§eGlobal§7] " + (player.isOp() ? "§7[§cOPERATOR§7] " : "") + "§7" + player.getName() + "§f: " + event.getMessage().substring(1).trim());
+            event.setFormat("§7(§eGlobal§7) " + (player.isOp() ? "§7[§cOPERATOR§7] " : "") + "§7" + player.getName() + "§f: " + event.getMessage().substring(1).trim());
         } else if (event.getMessage().startsWith("*") && event.getMessage().length() > 1) {
             event.getRecipients().clear();
             List<Player> playerStream = player.getWorld().getPlayers().stream()

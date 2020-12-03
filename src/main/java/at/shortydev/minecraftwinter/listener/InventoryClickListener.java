@@ -1,5 +1,6 @@
 package at.shortydev.minecraftwinter.listener;
 
+import at.shortydev.minecraftwinter.MinecraftWinter;
 import at.shortydev.minecraftwinter.predicates.PlayerAfkPredicate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,7 +21,7 @@ public class InventoryClickListener implements Listener {
             Player player = (Player) event.getWhoClicked();
 
             if (PLAYER_AFK_PREDICATE.test(player))
-                player.setPlayerListName("§7" + player.getName() + (player.isOp() ? " §7[§cOP§7]" : ""));
+                MinecraftWinter.getInstance().setStatus(player, null);
             
             LAST_INVENTORY_INTERACTION.put(player, System.currentTimeMillis());
             

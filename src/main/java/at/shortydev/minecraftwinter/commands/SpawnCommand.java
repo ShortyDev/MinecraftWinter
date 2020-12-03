@@ -15,8 +15,8 @@ public class SpawnCommand implements CommandExecutor {
         if (commandSender instanceof Player) {
             Player player = (Player) commandSender;
             
-            if (player.getWorld().getName().equals("world")) {
-                player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§7Du kannst nur von der Farmwelt, dem Nether oder dem End aus zurück zum Spawn.");
+            if (player.getLocation().getY() > MinecraftWinter.getInstance().getVelocityHeight() || !player.isOnGround()) {
+                player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§7Du bist schon am Spawn.");
                 return false;
             }
             
