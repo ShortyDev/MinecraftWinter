@@ -25,7 +25,7 @@ public class StatusCommand implements CommandExecutor {
                         break;
                     case "rp":
                         MinecraftWinter.getInstance().setStatus(player, "§eRP");
-                        MinecraftWinter.getInstance().statusCache.put(player.getUniqueId().toString(), "§RP");
+                        MinecraftWinter.getInstance().statusCache.put(player.getUniqueId().toString(), "§eRP");
                         player.sendMessage(MinecraftWinter.getInstance().getPrefix() + "§7Neuer Status: §eRP");
                         break;
                     case "off":
