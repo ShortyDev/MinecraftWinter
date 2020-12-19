@@ -1,6 +1,7 @@
 package at.shortydev.minecraftwinter.listener;
 
 import at.shortydev.minecraftwinter.MinecraftWinter;
+import at.shortydev.minecraftwinter.predicates.PlayerAfkPredicate;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -18,6 +19,7 @@ public class BedListener implements Listener {
     private boolean skipAllowed = false;
     private long skipTime = 0L;
     private final HashMap<Integer, Integer> neededForSkip = new HashMap<>();
+    private final PlayerAfkPredicate playerAfkPredicate = new PlayerAfkPredicate();
 
     public BedListener() {
         neededForSkip.put(1, 1);
@@ -66,7 +68,10 @@ public class BedListener implements Listener {
     }
 
     private int calculateNeeded() {
-        int onlineSize = Bukkit.getOnlinePlayers().stream().filter(player -> player.getWorld().getName().equals("world")).mapToInt(i -> 1).sum();
+        int onlineSize = Bukkit.getOnlinePlayers().stream()
+                .filter(player -> player.getWorld().getName().equals("world"))
+                .filter(player -> !playerAfkPredicate.test(player))
+                .mapToInt(i -> 1).sum();
         return neededForSkip.getOrDefault(onlineSize, onlineSize / 3);
     }
 
